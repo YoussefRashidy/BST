@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends AbstractBST<K,V,N>.Node > {
+public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends AbstractBST.Node<K,V,N>> {
 
-    private final N NIL = createNIL();
-    private N root = NIL;
+    protected final N NIL = createNIL();
+    protected N root = NIL;
     private int size;
 
-    protected class Node {
+    protected static class Node<K extends Comparable<? super K>, V, N extends Node<K,V,N>> {
         K key;
         V val;
         N left;
@@ -20,7 +20,6 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
         public Node(K key, V val) {
             this.key = key;
             this.val = val;
-            this.left = this.right = this.parent = NIL ;
         }
 
         public Node() {
@@ -28,16 +27,20 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
     }
 
     public int getSize() {
-        return this.size ;
+        return this.size;
     }
 
     public boolean insert(K key, V val) {
+        return insertRaw(key, val) != NIL ;
+    }
+
+    protected N insertRaw(K key, V val) {
         N y = NIL;
         N x = this.root;
         while (x != this.NIL) {
             y = x;
             int cmp = x.key.compareTo(key);
-            if (cmp == 0) return false;
+            if (cmp == 0) return NIL;
             else if (cmp > 0) x = x.left;
             else x = x.right;
         }
@@ -48,7 +51,7 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
         else y.right = z;
         z.left = z.right = NIL;
         size++;
-        return true;
+        return z;
     }
 
     public boolean Delete(K key) {
@@ -57,14 +60,14 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
         if (z.left == NIL) transplant(z, z.right);
         else if (z.right == NIL) transplant(z, z.left);
         else {
-            N y = getMin(z.right) ;
+            N y = getMin(z.right);
             if (y.parent != z) {
                 transplant(y, y.right);
-                y.right = z.right ;
-                y.right.parent = y ;
+                y.right = z.right;
+                y.right.parent = y;
             }
             transplant(z, y);
-            y.left = z.left ;
+            y.left = z.left;
             y.left.parent = y;
         }
         size--;
@@ -72,8 +75,8 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
     }
 
     protected N getMin(N x) {
-        while (x.left != NIL) x = x.left ;
-        return x ;
+        while (x.left != NIL) x = x.left;
+        return x;
     }
 
     protected N containsNode(K key) {
@@ -133,6 +136,7 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
                 , getHeight(root.right));
     }
 
-    protected abstract N createNode(K key , V value) ;
-    protected abstract N createNIL() ;
+    protected abstract N createNode(K key, V value);
+
+    protected abstract N createNIL();
 }

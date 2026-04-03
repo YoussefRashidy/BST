@@ -1,14 +1,10 @@
 package io.github.youssefrashidy;
 
-public class BST <K extends Comparable<? super K>,V> extends AbstractBST<K ,V,BST<K,V>.BSTNode>{
+public class BST <K extends Comparable<? super K>,V> extends AbstractBST<K ,V, BST.BSTNode<K,V>>{
 
-    protected class BSTNode extends Node {
-        public BSTNode(K key, V val) {
-            super(key, val);
-        }
-
-        public BSTNode() {
-        }
+    protected static class BSTNode<K extends Comparable<? super K>,V> extends Node<K,V,BSTNode<K,V>> {
+        public BSTNode(K key, V val) { super(key, val); }
+        public BSTNode() {}
     }
     @Override
     protected BSTNode createNode(K key, V value) {

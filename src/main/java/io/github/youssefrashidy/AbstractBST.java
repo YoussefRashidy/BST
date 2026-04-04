@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends AbstractBST.Node<K,V,N>> {
+public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends AbstractBST.Node<K, V, N>> {
 
     protected final N NIL = createNIL();
     protected N root = NIL;
     private int size;
 
-    protected static class Node<K extends Comparable<? super K>, V, N extends Node<K,V,N>> {
+    protected static class Node<K extends Comparable<? super K>, V, N extends Node<K, V, N>> {
         K key;
         V val;
         N left;
@@ -31,7 +31,7 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
     }
 
     public boolean insert(K key, V val) {
-        return insertRaw(key, val) != NIL ;
+        return insertRaw(key, val) != NIL;
     }
 
     protected N insertRaw(K key, V val) {
@@ -54,7 +54,7 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
         return z;
     }
 
-    public boolean Delete(K key) {
+    public boolean delete(K key) {
         N z = containsNode(key);
         if (z == NIL) return false;
         if (z.left == NIL) transplant(z, z.right);
@@ -96,7 +96,7 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
         if (u.parent == NIL) root = v;
         else if (u == u.parent.left) u.parent.left = v;
         else u.parent.right = v;
-        if (v != NIL) v.parent = u.parent;
+        v.parent = u.parent;
     }
 
     public boolean contains(K key) {

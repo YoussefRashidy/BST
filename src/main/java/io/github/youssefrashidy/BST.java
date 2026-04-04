@@ -7,12 +7,12 @@ public class BST <K extends Comparable<? super K>,V> extends AbstractBST<K ,V, B
         public BSTNode() {}
     }
     @Override
-    protected BSTNode createNode(K key, V value) {
-        return new BSTNode(key, value);
+    protected BSTNode<K,V> createNode(K key, V value) {
+        return new BSTNode<>(key, value);
     }
 
     @Override
-    protected BSTNode createNIL() {
-        return new BSTNode();
+    protected BSTNode<K,V> createNIL() {
+        return new BSTNode<>();
     }
 }

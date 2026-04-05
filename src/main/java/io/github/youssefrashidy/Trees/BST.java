@@ -1,4 +1,4 @@
-package io.github.youssefrashidy;
+package io.github.youssefrashidy.Trees;
 
 public class BST <K extends Comparable<? super K>,V> extends AbstractBST<K ,V, BST.BSTNode<K,V>>{
 

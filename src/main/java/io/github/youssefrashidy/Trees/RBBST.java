@@ -1,4 +1,4 @@
-package io.github.youssefrashidy;
+package io.github.youssefrashidy.Trees;
 
 public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V, RBBST.RBNode<K, V>> {
 

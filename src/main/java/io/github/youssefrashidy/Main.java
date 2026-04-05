@@ -1,5 +1,7 @@
 package io.github.youssefrashidy;
 
+import io.github.youssefrashidy.Trees.RBBST;
+
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
@@ -13,5 +15,26 @@ public class Main {
             // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
             System.out.println("i = " + i);
         }
+
+        RBBST<Integer,Integer> rbtree = new RBBST<>() ;
+        rbtree.insert(5, 5) ;
+        rbtree.insert(10,10) ;
+        rbtree.insert(11,11) ;
+        rbtree.insert(12,12) ;
+        rbtree.insert(8,13) ;
+        rbtree.insert(1,13) ;
+        rbtree.insert(14,13) ;
+        rbtree.insert(6,13) ;
+        rbtree.insert(19,13) ;
+
+
+        var inorder = rbtree.inOrder() ;
+        System.out.println(inorder);
+        rbtree.delete(19) ;
+        rbtree.delete(13) ;
+        rbtree.delete(12) ;
+        inorder = rbtree.inOrder() ;
+        System.out.println(inorder);
+
     }
 }

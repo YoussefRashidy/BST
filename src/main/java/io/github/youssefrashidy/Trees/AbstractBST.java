@@ -1,4 +1,4 @@
-package io.github.youssefrashidy;
+package io.github.youssefrashidy.Trees;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,6 +118,10 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
         return list;
     }
 
+    public void clear() {
+        root = NIL ;
+    }
+
     private void inOrder(List<Map.Entry<K, V>> list, N root) {
         if (root == NIL) return;
         inOrder(list, root.left);
@@ -139,4 +143,5 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
     protected abstract N createNode(K key, V value);
 
     protected abstract N createNIL();
+
 }

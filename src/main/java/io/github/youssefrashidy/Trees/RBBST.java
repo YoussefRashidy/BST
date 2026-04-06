@@ -1,14 +1,25 @@
 package io.github.youssefrashidy.Trees;
 
-public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V, RBBST.RBNode<K, V>> {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V, RBBST.RBNode<K, V>> {
+    private static final boolean VALIDATE = false;
+    private static final Logger logger = LoggerFactory.getLogger(RBBST.class) ;
 
     @Override
     public boolean insert(K key, V val) {
+        logger.info("Insert key {}",key);
         RBNode<K, V> z = insertRaw(key, val);
-        if (z == NIL) return false;
+        if (z == NIL) {
+            logger.warn("Duplicate Key {} ignored" , key);
+            return false;
+        }
         // add fixup
         fixupRB(z);
+        if (VALIDATE) new Validator<K,V>().validate(this);
+        logger.info("Insertion Completed tree size is {}",size);
         return true;
     }
 
@@ -17,20 +28,19 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
             var x = z.parent;
             if (x.parent.left == x) {
                 var y = x.parent.right;
-                // Case 1 change colors
                 if (y.color == Color.RED) {
+                    logger.debug("Insert fixup: Case 1 - recolor parent={} uncle={} grandparent={}", x.key, y.key, x.parent.key);
                     y.color = x.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     z = x.parent;
                 } else {
-                    // Case 2 z is right child and x is left
                     if (z == x.right) {
-                        // left rotate on x
+                        logger.debug("Insert fixup: Case 2 - left rotate on parent={}", x.key);
                         leftRotate(x);
                         z = x;
                         x = z.parent;
                     }
-                    // Case 3 z and x form a line change colors and rotate
+                    logger.debug("Insert fixup: Case 3 - right rotate on grandparent={} recolor", x.parent.key);
                     x.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     rightRotate(x.parent);
@@ -38,16 +48,18 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
             } else {
                 var y = x.parent.left;
                 if (y.color == Color.RED) {
+                    logger.debug("Insert fixup: Case 1 [mirror] - recolor parent={} uncle={} grandparent={}", x.key, y.key, x.parent.key);
                     y.color = x.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     z = x.parent;
                 } else {
                     if (z == x.left) {
-                        // left rotate on x
+                        logger.debug("Insert fixup: Case 2 [mirror] - right rotate on parent={}", x.key);
                         rightRotate(x);
                         z = x;
                         x = z.parent;
                     }
+                    logger.debug("Insert fixup: Case 3 [mirror] - left rotate on grandparent={} recolor", x.parent.key);
                     x.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     leftRotate(x.parent);
@@ -59,8 +71,12 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
 
     @Override
     public boolean delete(K key) {
+        logger.info("Delete key={}", key);
         var z = containsNode(key);
-        if (z == NIL) return false;
+        if (z == NIL) {
+            logger.warn("Delete key={} not found", key);
+            return false;
+        }
 
         RBNode<K, V> y = z;
         RBNode<K, V> x;
@@ -95,6 +111,8 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
             y.color = z.color;
         }
         if (originalColor == Color.BLACK) fixupDelete(x);
+        if (VALIDATE) new Validator<K,V>().validate(this);
+        logger.info("Delete completed, tree size={}", size);
         return true;
     }
 
@@ -102,69 +120,67 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
         while (x != root && x.color == Color.BLACK) {
             if (x == x.parent.left) {
                 var w = x.parent.right;
-                // case 1
                 if (w.color == Color.RED) {
+                    logger.debug("Delete fixup: Case 1 - recolor sibling={} left rotate parent={}", w.key, x.parent.key);
                     w.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     leftRotate(x.parent);
                     w = x.parent.right;
                 }
-                // case 2
                 if (w.left.color == Color.BLACK && w.right.color == Color.BLACK) {
+                    logger.debug("Delete fixup: Case 2 - push black up, recolor sibling={} move up from={}", w.key, x.key);
                     w.color = Color.RED;
                     x = x.parent;
-                }
-                else {
-                    // case 3
+                } else {
                     if (w.right.color == Color.BLACK) {
+                        logger.debug("Delete fixup: Case 3 - recolor sibling={} right rotate", w.key);
                         w.left.color = Color.BLACK;
                         w.color = Color.RED;
                         rightRotate(w);
                         w = x.parent.right;
                     }
-                    // case 4
-                    w.color = x.parent.color ;
-                    x.parent.color = Color.BLACK ;
-                    w.right.color = Color.BLACK ;
+                    logger.debug("Delete fixup: Case 4 - recolor sibling={} left rotate parent={}", w.key, x.parent.key);
+                    w.color = x.parent.color;
+                    x.parent.color = Color.BLACK;
+                    w.right.color = Color.BLACK;
                     leftRotate(x.parent);
-                    x = root ;
+                    x = root;
                 }
-            }
-            else {
+            } else {
                 var w = x.parent.left;
-                // case 1
                 if (w.color == Color.RED) {
+                    logger.debug("Delete fixup: Case 1 [mirror] - recolor sibling={} right rotate parent={}", w.key, x.parent.key);
                     w.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     rightRotate(x.parent);
                     w = x.parent.left;
                 }
-                // case 2
                 if (w.left.color == Color.BLACK && w.right.color == Color.BLACK) {
+                    logger.debug("Delete fixup: Case 2 [mirror] - push black up, recolor sibling={} move up from={}", w.key, x.key);
                     w.color = Color.RED;
                     x = x.parent;
-                }
-                else {
-                    // case 3
+                } else {
                     if (w.left.color == Color.BLACK) {
+                        logger.debug("Delete fixup: Case 3 [mirror] - recolor sibling={} left rotate", w.key);
                         w.right.color = Color.BLACK;
                         w.color = Color.RED;
                         leftRotate(w);
                         w = x.parent.left;
                     }
-                    // case 4
-                    w.color = x.parent.color ;
-                    x.parent.color = Color.BLACK ;
-                    w.left.color = Color.BLACK ;
+                    logger.debug("Delete fixup: Case 4 [mirror] - recolor sibling={} right rotate parent={}", w.key, x.parent.key);
+                    w.color = x.parent.color;
+                    x.parent.color = Color.BLACK;
+                    w.left.color = Color.BLACK;
                     rightRotate(x.parent);
-                    x = root ;
+                    x = root;
                 }
             }
         }
-        x.color = Color.BLACK ;
+        x.color = Color.BLACK;
     }
 
     private void leftRotate(RBNode<K, V> x) {
+        logger.debug("Left rotate: pivot={}", x.key);
         RBNode<K, V> y = x.right;
         if (y.left != NIL) y.left.parent = x;
         x.right = y.left;
@@ -177,6 +193,7 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
     }
 
     private void rightRotate(RBNode<K, V> x) {
+        logger.debug("Right rotate: pivot={}", x.key);
         RBNode<K, V> y = x.left;
         if (y.right != NIL) y.right.parent = x;
         x.left = y.right;
@@ -216,5 +233,76 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
     @Override
     protected RBNode<K, V> createNIL() {
         return new RBNode<>();
+    }
+
+    private static class Validator<K extends Comparable<? super K>, V> {
+        /*
+         * Property 1 (nodes are either red or black) is tautology  because of enum color
+         * There is no need to check property 3 (NIL nodes are black) but it is being checked anyway
+         * */
+
+        public void validate(RBBST<K, V> tree) {
+            if (!isRootBlack(tree)) {
+                logger.error("RB violation: root is not black");
+                throw new RBViolationException("Root is not black");
+            }
+            if (!isBlackHeightEqual(tree)) {
+                logger.error("RB violation: black-height inconsistency detected");
+                throw new RBViolationException("Black-height inconsistency detected");
+            }
+            if (!isNoConsecutiveReds(tree)) {
+                logger.error("RB violation: consecutive red nodes detected");
+                throw new RBViolationException("Red-red violation detected");
+            }
+            logger.debug("Validation passed");
+        }
+
+        public boolean isRootBlack(RBBST<K, V> tree) {
+            return tree.root.color == Color.BLACK;
+        }
+
+        public boolean isLeavesBlack(RBBST<K, V> tree) {
+            var x = tree.root;
+            return isLeavesBlack(x, tree);
+        }
+
+        private boolean isLeavesBlack(RBNode<K, V> node, RBBST<K, V> tree) {
+            if (node == tree.NIL && node.color == Color.BLACK) return true;
+            return isLeavesBlack(node.left, tree) && isLeavesBlack(node.right, tree);
+        }
+
+        public boolean isBlackHeightEqual(RBBST<K, V> tree) {
+            return getBlackHeight(tree.root, tree) != -1;
+        }
+
+
+        private int getBlackHeight(RBNode<K, V> node, RBBST<K, V> tree) {
+            if (node == tree.NIL) return 0;
+            int height = node.color == Color.BLACK ? 1 : 0;
+            int leftHeight = getBlackHeight(node.left, tree);
+            int rightHeight = getBlackHeight(node.right, tree);
+            if (leftHeight != rightHeight) return -1;
+            else if (leftHeight == -1) return -1;
+            else return leftHeight + height;
+        }
+
+        public boolean isNoConsecutiveReds(RBBST<K, V> tree) {
+            return isNoConsecutiveReds(tree.root, tree);
+        }
+
+        private boolean isNoConsecutiveReds(RBNode<K, V> node, RBBST<K, V> tree) {
+            if (node == tree.NIL) return true;
+            else if (node.color == Color.RED) {
+                if (node.left.color == Color.RED || node.right.color == Color.RED) return false;
+            }
+            return isNoConsecutiveReds(node.left, tree) && isNoConsecutiveReds(node.right, tree);
+        }
+
+    }
+
+    private static class RBViolationException extends RuntimeException {
+        public RBViolationException(String message) {
+            super(message);
+        }
     }
 }

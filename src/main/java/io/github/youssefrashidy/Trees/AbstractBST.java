@@ -8,7 +8,7 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
 
     protected final N NIL = createNIL();
     protected N root = NIL;
-    private int size;
+    protected int size;
 
     protected static class Node<K extends Comparable<? super K>, V, N extends Node<K, V, N>> {
         K key;

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V, RBBST.RBNode<K, V>> {
-    private static final boolean VALIDATE = false;
+    private static final boolean VALIDATE = true;
     private static final Logger logger = LoggerFactory.getLogger(RBBST.class) ;
 
     @Override
@@ -113,6 +113,7 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
         if (originalColor == Color.BLACK) fixupDelete(x);
         if (VALIDATE) new Validator<K,V>().validate(this);
         logger.info("Delete completed, tree size={}", size);
+        size--;
         return true;
     }
 

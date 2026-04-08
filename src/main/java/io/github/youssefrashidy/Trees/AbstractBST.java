@@ -120,6 +120,7 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
 
     public void clear() {
         root = NIL ;
+        size = 0 ;
     }
 
     private void inOrder(List<Map.Entry<K, V>> list, N root) {
@@ -130,11 +131,12 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
     }
 
     public int getHeight() {
+        if (root == NIL) return 0;
         return getHeight(root);
     }
 
     private int getHeight(N root) {
-        if (root == NIL) return 0;
+        if (root == NIL) return -1;
         return 1 + Math.max(
                 getHeight(root.left)
                 , getHeight(root.right));

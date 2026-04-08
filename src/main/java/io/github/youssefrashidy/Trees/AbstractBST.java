@@ -9,6 +9,10 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
     protected final N NIL = createNIL();
     protected N root = NIL;
     protected int size;
+    private static final String RESET   = "\u001B[0m";
+    private static final String FG      = "\u001B[36m";
+    private static final String DIM     = "\u001B[2m";
+    private static final String BOLD    = "\u001B[1m";
 
     protected static class Node<K extends Comparable<? super K>, V, N extends Node<K, V, N>> {
         K key;
@@ -140,6 +144,46 @@ public abstract class AbstractBST<K extends Comparable<? super K>, V, N extends 
         return 1 + Math.max(
                 getHeight(root.left)
                 , getHeight(root.right));
+    }
+
+    public void print(String prefix, N node, boolean isLast, boolean isRoot) {
+        // delegates to overridable hook
+        printNode(prefix, node, isLast, isRoot);
+    }
+
+    public void print() {
+        if (root == NIL) {
+            System.out.println("(empty tree)");
+            return;
+        }
+        print("", root, true, true);
+    }
+
+
+    protected void printNode(String prefix, N node, boolean isLast, boolean isRoot) {
+        boolean hasLeft  = node.left  != NIL;
+        boolean hasRight = node.right != NIL;
+
+        String label = FG + "○ " + BOLD + node.key + RESET
+                + FG + " → " + node.val + RESET;
+
+        System.out.println(DIM + prefix + RESET + label);
+
+        if (!hasLeft && !hasRight) return;
+
+        String childPrefix = isRoot
+                ? "    "
+                : prefix.endsWith("├── ") ? prefix.replace("├── ", "│   ")
+                : prefix.replace("└── ", "    ");
+
+        if (hasLeft && hasRight) {
+            print(childPrefix + "├── ", node.left,  false, false);
+            print(childPrefix + "└── ", node.right, true,  false);
+        } else if (hasLeft) {
+            print(childPrefix + "└── ", node.left,  true,  false);
+        } else {
+            print(childPrefix + "└── ", node.right, true,  false);
+        }
     }
 
     protected abstract N createNode(K key, V value);

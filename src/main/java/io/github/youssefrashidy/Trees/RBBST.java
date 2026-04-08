@@ -4,9 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+
 public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V, RBBST.RBNode<K, V>> {
     private static final boolean VALIDATE = true;
     private static final Logger logger = LoggerFactory.getLogger(RBBST.class) ;
+    private static final String RESET   = "\u001B[0m";
+    private static final String RED_FG  = "\u001B[91m";
+    private static final String GRAY_FG = "\u001B[90m";
+    private static final String DIM     = "\u001B[2m";
+    private static final String BOLD    = "\u001B[1m";
 
     @Override
     public boolean insert(K key, V val) {
@@ -234,6 +240,49 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
     @Override
     protected RBNode<K, V> createNIL() {
         return new RBNode<>();
+    }
+
+//    public void print(String prefix, RBNode<K, V> node) {
+//        printNode(prefix, node, true, false);
+//    }
+
+    @Override
+    protected void printNode(String prefix, RBNode<K, V> node, boolean isLast, boolean isRoot) {
+        boolean hasLeft  = node.left  != NIL;
+        boolean hasRight = node.right != NIL;
+
+        String dot     = node.color == Color.RED ? "●" : "○";
+        String colorFg = node.color == Color.RED ? RED_FG : GRAY_FG;
+        String label   = colorFg + dot + " " + BOLD + node.key + RESET
+                + colorFg + " → " + node.val + RESET;
+
+        System.out.println(DIM + prefix + RESET + label);
+
+        if (!hasLeft && !hasRight) return;
+
+        String childPrefix = isRoot
+                ? "    "
+                : prefix.endsWith("├── ") ? prefix.replace("├── ", "│   ")
+                : prefix.replace("└── ", "    ");
+
+        if (hasLeft && hasRight) {
+            print(childPrefix + "├── ", node.left,  false, false);
+            print(childPrefix + "└── ", node.right, true,  false);
+        } else if (hasLeft) {
+            print(childPrefix + "└── ", node.left,  true,  false);
+        } else {
+            print(childPrefix + "└── ", node.right, true,  false);
+        }
+    }
+
+    private int computeBlackHeight() {
+        int h = 0;
+        RBNode<K, V> x = root;
+        while (x != NIL) {
+            if (x.color == Color.BLACK) h++;
+            x = x.left;
+        }
+        return h;
     }
 
     private static class Validator<K extends Comparable<? super K>, V> {

@@ -350,6 +350,55 @@ class BSTTest {
             assertEquals(List.of(3, 4, 7, 10, 13, 14),
                     traversal.stream().map(Map.Entry::getKey).toList());
         }
+        @Test
+        @DisplayName("bulk insert/contains/delete operations remain correct under large workload")
+        void bulkOperationsShouldRemainCorrectUnderLargeWorkload() {
+            final int n = 10_000;
+
+            for (int i = 1; i <= n; i++) {
+                assertTrue(bst.insert(i, i));
+                if (i % 1000 == 0) {
+                    assertBSTInvariants();
+                }
+            }
+            assertEquals(n, bst.getSize());
+
+            for (int i = 1; i <= n; i++) {
+                assertTrue(bst.contains(i));
+            }
+            for (int i = n + 1; i <= n + 1000; i++) {
+                assertFalse(bst.contains(i));
+            }
+
+            for (int i = 2; i <= n; i += 2) {
+                assertTrue(bst.delete(i));
+                if (i % 1000 == 0) {
+                    assertBSTInvariants();
+                }
+            }
+            assertEquals(n / 2, bst.getSize());
+
+            for (int i = 1; i <= n; i++) {
+                if (i % 2 == 0) {
+                    assertFalse(bst.contains(i));
+                } else {
+                    assertTrue(bst.contains(i));
+                }
+            }
+
+            for (int i = 1; i <= n; i += 2) {
+                assertTrue(bst.delete(i));
+                if (i % 1001 == 1) {
+                    assertBSTInvariants();
+                }
+            }
+
+            assertEquals(0, bst.getSize());
+            assertTrue(bst.inOrder().isEmpty());
+            assertFalse(bst.delete(1));
+            assertFalse(bst.contains(1));
+            assertBSTInvariants();
+        }
     }
 
 

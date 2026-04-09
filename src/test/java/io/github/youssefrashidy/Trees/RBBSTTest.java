@@ -312,6 +312,55 @@ class RBBSTTest {
             assertEquals(List.of(3, 4, 7, 10, 13, 14),
                     traversal.stream().map(Map.Entry::getKey).toList());
         }
+
+        @Test
+        @DisplayName("bulk insert/contains/delete operations remain correct under large workload")
+        void bulkOperationsShouldRemainCorrectUnderLargeWorkload() {
+            final int n = 10_000;
+
+            for (int i = 1; i <= n; i++) {
+                assertTrue(tree.insert(i, i));
+                if (i % 1000 == 0) {
+                    assertBSTInvariants();
+                }
+            }
+            assertEquals(n, tree.getSize());
+
+            for (int i = 1; i <= n; i++) {
+                assertTrue(tree.contains(i));
+            }
+            for (int i = n + 1; i <= n + 1000; i++) {
+                assertFalse(tree.contains(i));
+            }
+
+            for (int i = 2; i <= n; i += 2) {
+                assertTrue(tree.delete(i));
+                if (i % 1000 == 0) {
+                    assertBSTInvariants();
+                }
+            }
+            assertEquals(n / 2, tree.getSize());
+
+            for (int i = 1; i <= n; i++) {
+                if (i % 2 == 0) {
+                    assertFalse(tree.contains(i));
+                } else {
+                    assertTrue(tree.contains(i));
+                }
+            }
+
+            for (int i = 1; i <= n; i += 2) {
+                assertTrue(tree.delete(i));
+                if (i % 1001 == 1) {
+                    assertBSTInvariants();
+                }
+            }
+
+            assertEquals(0, tree.getSize());
+            assertTrue(tree.inOrder().isEmpty());
+            assertFalse(tree.delete(1));
+            assertFalse(tree.contains(1));
+            assertBSTInvariants();
+        }
     }
 }
-

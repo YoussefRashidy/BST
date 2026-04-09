@@ -14,7 +14,7 @@
     </appender>
 
     <!-- your tree package specifically -->
-    <logger name="io.github.youssefrashidy.Trees" level="ERROR"/>
+    <logger name="io.github.youssefrashidy.Trees" level="WARN"/>
 
     <root level="WARN">
         <appender-ref ref="FILE"/>

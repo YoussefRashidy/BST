@@ -3,29 +3,31 @@ package io.github.youssefrashidy.Trees;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Map;
 
 
 public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V, RBBST.RBNode<K, V>> {
     private static final boolean VALIDATE = false;
-    private static final Logger logger = LoggerFactory.getLogger(RBBST.class) ;
-    private static final String RESET   = "\u001B[0m";
-    private static final String RED_FG  = "\u001B[91m";
+    private static final Logger logger = LoggerFactory.getLogger(RBBST.class);
+    private static final String RESET = "\u001B[0m";
+    private static final String RED_FG = "\u001B[91m";
     private static final String GRAY_FG = "\u001B[90m";
-    private static final String DIM     = "\u001B[2m";
-    private static final String BOLD    = "\u001B[1m";
+    private static final String DIM = "\u001B[2m";
+    private static final String BOLD = "\u001B[1m";
 
     @Override
     public boolean insert(K key, V val) {
-        logger.info("Insert key {}",key);
+        logger.info("Insert key {}", key);
         RBNode<K, V> z = insertRaw(key, val);
         if (z == NIL) {
-            logger.warn("Duplicate Key {} ignored" , key);
+            logger.warn("Duplicate Key {} ignored", key);
             return false;
         }
         // add fixup
         fixupRB(z);
-        if (VALIDATE) new Validator<K,V>().validate(this);
-        logger.info("Insertion Completed tree size is {}",size);
+        if (VALIDATE) new Validator<K, V>().validate(this);
+        logger.info("Insertion Completed tree size is {}", size);
         return true;
     }
 
@@ -117,7 +119,7 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
             y.color = z.color;
         }
         if (originalColor == Color.BLACK) fixupDelete(x);
-        if (VALIDATE) new Validator<K,V>().validate(this);
+        if (VALIDATE) new Validator<K, V>().validate(this);
         logger.info("Delete completed, tree size={}", size);
         size--;
         return true;
@@ -248,12 +250,12 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
 
     @Override
     protected void printNode(String prefix, RBNode<K, V> node, boolean isLast, boolean isRoot) {
-        boolean hasLeft  = node.left  != NIL;
+        boolean hasLeft = node.left != NIL;
         boolean hasRight = node.right != NIL;
 
-        String dot     = node.color == Color.RED ? "●" : "○";
+        String dot = node.color == Color.RED ? "●" : "○";
         String colorFg = node.color == Color.RED ? RED_FG : GRAY_FG;
-        String label   = colorFg + dot + " " + BOLD + node.key + RESET
+        String label = colorFg + dot + " " + BOLD + node.key + RESET
                 + colorFg + " → " + node.val + RESET;
 
         System.out.println(DIM + prefix + RESET + label);
@@ -266,12 +268,12 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
                 : prefix.replace("└── ", "    ");
 
         if (hasLeft && hasRight) {
-            print(childPrefix + "├── ", node.left,  false, false);
-            print(childPrefix + "└── ", node.right, true,  false);
+            print(childPrefix + "├── ", node.left, false, false);
+            print(childPrefix + "└── ", node.right, true, false);
         } else if (hasLeft) {
-            print(childPrefix + "└── ", node.left,  true,  false);
+            print(childPrefix + "└── ", node.left, true, false);
         } else {
-            print(childPrefix + "└── ", node.right, true,  false);
+            print(childPrefix + "└── ", node.right, true, false);
         }
     }
 
@@ -303,6 +305,13 @@ public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V,
             if (!isNoConsecutiveReds(tree)) {
                 logger.error("RB violation: consecutive red nodes detected");
                 throw new RBViolationException("Red-red violation detected");
+            }
+            List<Map.Entry<K, V>> traversal = tree.inOrder();
+            for (int i = 1; i < traversal.size(); i++) {
+                if (traversal.get(i - 1).getKey().compareTo(traversal.get(i).getKey()) > 0) {
+                    logger.error("BST violation: in-order traversal is not sorted at index {} with keys {} and {}", i, traversal.get(i - 1).getKey(), traversal.get(i).getKey());
+                    throw new RBViolationException("BST violation: in-order traversal is not sorted at index " + i);
+                }
             }
             logger.debug("Validation passed");
         }

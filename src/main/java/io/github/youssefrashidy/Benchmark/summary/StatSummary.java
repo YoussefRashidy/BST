@@ -1,6 +1,7 @@
-package io.github.youssefrashidy.Benchmark;
+package io.github.youssefrashidy.Benchmark.summary;
 
 import io.github.youssefrashidy.ArrayGeneration.ArrayType;
+import io.github.youssefrashidy.Benchmark.Operation;
 
 import java.util.Locale;
 

@@ -1,11 +1,16 @@
 package io.github.youssefrashidy.Benchmark;
 
-import io.github.youssefrashidy.ArrayGeneration.ArrayGenerator;
 import io.github.youssefrashidy.ArrayGeneration.ArrayType;
 import io.github.youssefrashidy.Benchmark.Adaptor.ArrayAdaptor;
 import io.github.youssefrashidy.Benchmark.Adaptor.BenchMarkArray;
 import io.github.youssefrashidy.Benchmark.Adaptor.BenchMarkArrayGenerator;
-import io.github.youssefrashidy.Benchmark.Stat.*;
+import io.github.youssefrashidy.Benchmark.Stat.BenchMark;
+import io.github.youssefrashidy.Benchmark.Stat.BenchPair;
+import io.github.youssefrashidy.Benchmark.Stat.Contains;
+import io.github.youssefrashidy.Benchmark.Stat.Deletion;
+import io.github.youssefrashidy.Benchmark.Stat.Insertion;
+import io.github.youssefrashidy.Benchmark.Stat.Stat;
+import io.github.youssefrashidy.Benchmark.Stat.TreeSort;
 import io.github.youssefrashidy.Trees.AbstractBST;
 import io.github.youssefrashidy.Trees.BST;
 import io.github.youssefrashidy.Trees.RBBST;
@@ -14,29 +19,43 @@ import java.util.*;
 
 public class Benchmarker {
 
-    static final int WARMUP_ITERATIONS = 3;
-    static final int MEASUREMENT_ITERATIONS = 5;
-    private final int seed = 1234;
+    // Full run — one time, for final report
+    public static final int WARMUP_ITERATIONS = 5;
+    public static final int MEASUREMENT_ITERATIONS = 20;
+    public static final int NUM_ARRAYS = 20;
+    public static final int seed = 1234 ;
+
+    // Quick run — for development and sanity checks
+    // public static final int WARMUP_ITERATIONS = 3;
+    //public static final int MEASUREMENT_ITERATIONS = 5;
+    //public static final int NUM_ARRAYS = 10;
     List<Operation> operations = Arrays.asList(Operation.Insertion, Operation.Contains, Operation.Deletion, Operation.TreeSort);
 
     public List<BenchPair> runBenchMark() {
-        ArrayList<BenchPair> results = new ArrayList<>();
+        ArrayList<io.github.youssefrashidy.Benchmark.Stat.BenchPair> results = new ArrayList<>();
         RBBST<Integer, Integer> redBlack = new RBBST<>();
         BST<Integer, Integer> bst = new BST<>();
 
         ArrayAdaptor generator = new BenchMarkArrayGenerator();
         // Generate Arrays
         ArrayList<BenchMarkArray> arrays = new ArrayList<>();
-        arrays.add(generator.getRandomArray(100000));
-        arrays.add(generator.getNearlySorted_10(100000));
-        arrays.add(generator.getNearlySorted_5(100000));
-        arrays.add(generator.getNearlySorted_1(100000));
+        for (ArrayType type : ArrayType.values()) {
+            for (int i = 0; i < NUM_ARRAYS; i++) {
+                switch (type) {
+                    case RANDOM -> arrays.add(generator.getRandomArray(100000));
+                    case NEARLY_SORTED_10 -> arrays.add(generator.getNearlySorted_10(100000));
+                    case NEARLY_SORTED_5 -> arrays.add(generator.getNearlySorted_5(100000));
+                    case NEARLY_SORTED_1 -> arrays.add(generator.getNearlySorted_1(100000));
+                }
+            }
+        }
+
 
         // run for RB
         for (var array : arrays) {
             for (var op : operations) {
 
-                BenchMark runBST = new BenchMark(new ArrayList<>() , op);
+                BenchMark runBST = new BenchMark(new ArrayList<>(), op);
 
                 for (int i = 0; i < WARMUP_ITERATIONS; i++) {
                     runSingleBench(array, bst, op);
@@ -47,7 +66,7 @@ public class Benchmarker {
                     bst.clear();
                 }
 
-                BenchMark run = new BenchMark(new ArrayList<>() , op);
+                BenchMark run = new BenchMark(new ArrayList<>(), op);
 
                 for (int i = 0; i < WARMUP_ITERATIONS; i++) {
                     runSingleBench(array, redBlack, op);
@@ -59,7 +78,8 @@ public class Benchmarker {
                 }
 
 
-                BenchPair pair = new BenchPair(run, runBST, op, array.inputDistribution());
+                io.github.youssefrashidy.Benchmark.Stat.BenchPair pair =
+                        new io.github.youssefrashidy.Benchmark.Stat.BenchPair(run, runBST, op, array.inputDistribution());
                 results.add(pair);
             }
         }
@@ -67,12 +87,12 @@ public class Benchmarker {
         return results;
     }
 
-    private Stat runSingleBench(BenchMarkArray array, AbstractBST<Integer, Integer, ?> tree, Operation operation) {
+    public Stat runSingleBench(BenchMarkArray array, AbstractBST<Integer, Integer, ?> tree, Operation operation) {
         switch (operation) {
             case Insertion -> {
                 long time = runInsertion(array.array(), tree);
                 int height = tree.getHeight();
-                return new Insertion(tree.getClass().getName(), array.inputDistribution(), height, time);
+                return new Insertion(tree.getClass().getSimpleName(), array.inputDistribution(), height, time);
             }
             case Contains -> {
                 for (var key : array.array()) tree.insert(key, key);
@@ -85,7 +105,7 @@ public class Benchmarker {
                 }
                 long time = runContains(testArray, tree);
                 int height = tree.getHeight();
-                return new Contains(tree.getClass().getName(), array.inputDistribution(), height, time);
+                return new Contains(tree.getClass().getSimpleName(), array.inputDistribution(), height, time);
 
             }
             case Deletion -> {
@@ -93,12 +113,12 @@ public class Benchmarker {
                 int[] testArray = getRandomDeletion(array.array(), 20);
                 long time = runDeletion(testArray, tree);
                 int height = tree.getHeight();
-                return new Deletion(tree.getClass().getName(), array.inputDistribution(), height, time);
+                return new Deletion(tree.getClass().getSimpleName(), array.inputDistribution(), height, time);
             }
             case TreeSort -> {
                 long time = runTreeSort(array.array(), tree);
                 int height = tree.getHeight();
-                return new TreeSort(tree.getClass().getName(), array.inputDistribution(), height, time);
+                return new TreeSort(tree.getClass().getSimpleName(), array.inputDistribution(), height, time);
             }
             default -> throw new RuntimeException("Invalid operation : " + operation);
         }

@@ -28,24 +28,29 @@ public class TreeShell {
         printWelcome();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("treeshell> ");
-            String command = scanner.nextLine().trim();
-            if (command.isEmpty()) {
-                continue;
-            }
-            if (command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("quit")) {
-                break;
-            }
-            var tokens = tokenizer.tokenize(command);
-            var nodes = parser.parse(tokens);
-            for (var node : nodes) {
-                switch (node) {
-                    case NewNode newNode -> newNode.execute();
-                    case CommandNode commandNode -> commandNode.execute();
-                    default ->
-                            throw new IllegalArgumentException("Unsupported node: " + node.getClass().getSimpleName());
+            try {
+                System.out.print("treeshell> ");
+                String command = scanner.nextLine().trim();
+                if (command.isEmpty()) {
+                    continue;
                 }
+                if (command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("quit")) {
+                    break;
+                }
+                var tokens = tokenizer.tokenize(command);
+                var nodes = parser.parse(tokens);
+                for (var node : nodes) {
+                    switch (node) {
+                        case NewNode newNode -> newNode.execute();
+                        case CommandNode commandNode -> commandNode.execute();
+                        default ->
+                                throw new IllegalArgumentException("Unsupported node: " + node.getClass().getSimpleName());
+                    }
+                }
+            } catch (RuntimeException e) {
+                System.out.println(e.getMessage());
             }
+
         }
     }
 

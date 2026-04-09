@@ -54,8 +54,19 @@ public class ArrayGenerator {
         }
         return arr;
     }
+    public int[] nearlySortedArray(int size, int swaps , int max) {
+        int[] arr = sortedArray(size,max);
+        for (int i = 0; i < swaps; i++) {
+            int a = rand.nextInt(size);
+            int b = rand.nextInt(size);
+            int tmp = arr[a];
+            arr[a] = arr[b];
+            arr[b] = tmp;
+        }
+        return arr;
+    }
 
-    public int[] nearlySortedArray(int size) {
+        public int[] nearlySortedArray(int size) {
         return nearlySortedArray(size, Math.max(1, size / 10));
     }
 

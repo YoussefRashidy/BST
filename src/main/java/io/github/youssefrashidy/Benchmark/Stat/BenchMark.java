@@ -1,6 +1,6 @@
-package io.github.youssefrashidy.Benchmark;
+package io.github.youssefrashidy.Benchmark.Stat;
 
-import io.github.youssefrashidy.Benchmark.Stat.Stat;
+import io.github.youssefrashidy.Benchmark.Operation;
 
 import java.util.ArrayList;
 

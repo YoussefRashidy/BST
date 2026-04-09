@@ -1,6 +1,12 @@
 package io.github.youssefrashidy.Benchmark;
 
+import io.github.youssefrashidy.Benchmark.Stat.BenchMark;
+import io.github.youssefrashidy.Benchmark.Stat.BenchPair;
+import io.github.youssefrashidy.Benchmark.Stat.SortBench;
 import io.github.youssefrashidy.Benchmark.Stat.Stat;
+import io.github.youssefrashidy.Benchmark.summary.PairSummary;
+import io.github.youssefrashidy.Benchmark.summary.SortComparison;
+import io.github.youssefrashidy.Benchmark.summary.StatSummary;
 
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
@@ -14,6 +20,19 @@ public class FeatureExtractor {
             StatSummary rbSummary = getFullSummaryRB(pair.RB(), bstSummary.mean());
             PairSummary pairSummary = new PairSummary(bstSummary, rbSummary);
             summaries.add(pairSummary);
+        }
+        return summaries;
+    }
+
+    public List<SortComparison> extractSortFeatures(List<SortBench> benches) {
+        List<SortComparison> summaries = new ArrayList<>();
+        for (var bench : benches) {
+            StatSummary bstSummary = getFullSummaryBST(bench.BST());
+            StatSummary rbSummary = getFullSummaryRB(bench.RB(), bstSummary.mean());
+            StatSummary unboxedSummary = getFullSummaryRB(bench.QuickSortUnboxed(), bstSummary.mean());
+            StatSummary boxedSummary = getFullSummaryRB(bench.QuickSortBoxed(),bstSummary.mean());
+            SortComparison sortComparison = new SortComparison(bstSummary, rbSummary, unboxedSummary, boxedSummary);
+            summaries.add(sortComparison);
         }
         return summaries;
     }

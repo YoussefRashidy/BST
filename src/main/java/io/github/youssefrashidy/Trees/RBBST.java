@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class RBBST<K extends Comparable<? super K>, V> extends AbstractBST<K, V, RBBST.RBNode<K, V>> {
-    private static final boolean VALIDATE = true;
+    private static final boolean VALIDATE = false;
     private static final Logger logger = LoggerFactory.getLogger(RBBST.class) ;
     private static final String RESET   = "\u001B[0m";
     private static final String RED_FG  = "\u001B[91m";

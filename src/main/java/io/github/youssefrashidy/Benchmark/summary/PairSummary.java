@@ -1,4 +1,4 @@
-package io.github.youssefrashidy.Benchmark;
+package io.github.youssefrashidy.Benchmark.summary;
 
 public record PairSummary(StatSummary bst , StatSummary rb) {
     @Override

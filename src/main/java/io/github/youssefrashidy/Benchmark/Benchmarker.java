@@ -16,11 +16,11 @@ public class Benchmarker {
 
     static final int WARMUP_ITERATIONS = 3;
     static final int MEASUREMENT_ITERATIONS = 5;
-    private final int seed = 1234 ;
+    private final int seed = 1234;
     List<Operation> operations = Arrays.asList(Operation.Insertion, Operation.Contains, Operation.Deletion, Operation.TreeSort);
 
-    public List<BenchMark> runBenchMark() {
-        ArrayList<BenchMark> results = new ArrayList<>();
+    public List<BenchPair> runBenchMark() {
+        ArrayList<BenchPair> results = new ArrayList<>();
         RBBST<Integer, Integer> redBlack = new RBBST<>();
         BST<Integer, Integer> bst = new BST<>();
 
@@ -35,7 +35,20 @@ public class Benchmarker {
         // run for RB
         for (var array : arrays) {
             for (var op : operations) {
-                BenchMark run = new BenchMark(new ArrayList<>());
+
+                BenchMark runBST = new BenchMark(new ArrayList<>() , op);
+
+                for (int i = 0; i < WARMUP_ITERATIONS; i++) {
+                    runSingleBench(array, bst, op);
+                    bst.clear();
+                }
+                for (int i = 0; i < MEASUREMENT_ITERATIONS; i++) {
+                    runBST.add(runSingleBench(array, bst, op));
+                    bst.clear();
+                }
+
+                BenchMark run = new BenchMark(new ArrayList<>() , op);
+
                 for (int i = 0; i < WARMUP_ITERATIONS; i++) {
                     runSingleBench(array, redBlack, op);
                     redBlack.clear();
@@ -44,23 +57,13 @@ public class Benchmarker {
                     run.add(runSingleBench(array, redBlack, op));
                     redBlack.clear();
                 }
-                results.add(run);
+
+
+                BenchPair pair = new BenchPair(run, runBST, op, array.inputDistribution());
+                results.add(pair);
             }
         }
-        for (var array : arrays) {
-            for (var op : operations) {
-                BenchMark run = new BenchMark(new ArrayList<>());
-                for (int i = 0; i < WARMUP_ITERATIONS; i++) {
-                    runSingleBench(array, bst, op);
-                    bst.clear();
-                }
-                for (int i = 0; i < MEASUREMENT_ITERATIONS; i++) {
-                    run.add(runSingleBench(array, bst, op));
-                    bst.clear();
-                }
-                results.add(run);
-            }
-        }
+
         return results;
     }
 
@@ -177,12 +180,12 @@ public class Benchmarker {
         Random rng = new Random(seed);
         int count = percentage * array.length / 100;
         int[] copy = array.clone();
-        for (int i = 0; i < count; i++) {
+        for (int i = array.length - 1; i > array.length - count; i--) {
             int index1 = rng.nextInt(0, i + 1);
             int temp = copy[index1];
             copy[index1] = copy[i];
             copy[i] = temp;
         }
-        return Arrays.copyOfRange(copy, 0, count);
+        return Arrays.copyOfRange(copy, copy.length - count, copy.length);
     }
 }

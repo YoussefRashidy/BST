@@ -158,8 +158,6 @@ Available commands:
 - `tree.delete(key)` - Remove element
 - `tree.contains(key)` - Search element
 - `tree.inorder()` - In-order traversal
-- `tree.preorder()` - Pre-order traversal
-- `tree.postorder()` - Post-order traversal
 - `exit` - Exit shell
 
 #### Option 2: Tree Benchmark

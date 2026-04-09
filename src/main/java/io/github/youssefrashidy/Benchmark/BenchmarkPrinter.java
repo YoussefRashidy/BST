@@ -69,11 +69,11 @@ public class BenchmarkPrinter {
                 s.dataStructure(),
                 String.valueOf(s.runs()),
                 s.height() < 0 ? "N/A" : String.valueOf(s.height()),
-                String.format(Locale.US, "%.3f", s.min()),
-                String.format(Locale.US, "%.3f", s.max()),
-                String.format(Locale.US, "%.3f", s.mean()),
-                String.format(Locale.US, "%.3f", s.median()),
-                String.format(Locale.US, "%.3f", s.std()),
+                String.format(Locale.US, "%.3f", s.min() / 1_000_000),
+                String.format(Locale.US, "%.3f", s.max() / 1_000_000),
+                String.format(Locale.US, "%.3f", s.mean() / 1_000_000),
+                String.format(Locale.US, "%.3f", s.median() / 1_000_000),
+                String.format(Locale.US, "%.3f", s.std() / 1_000_000),
                 s.speedup() < 0 ? "—" : String.format(Locale.US, "%.4fx", s.speedup())
         };
     }

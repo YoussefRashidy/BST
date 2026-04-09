@@ -17,11 +17,11 @@ public record StatSummary(long runs, double min, double max, double mean, double
                 dataStructure,
                 runs,
                 height,
-                min,
-                max,
-                mean,
+                min ,
+                max ,
+                mean ,
                 median,
-                std,
+                std ,
                 speedup
         );
     }

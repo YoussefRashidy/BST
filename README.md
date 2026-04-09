@@ -48,6 +48,8 @@ BSTs/
 │   ├── SortBench.csv
 │   ├── TreeBench.csv
 │   └── res.csv
+├── Docs/                            # Assignment documentation
+│   └── DSA_Assignment2.pdf
 │
 ├── src/main/java/io/github/youssefrashidy/
 │   ├── Main.java                    # Entry point with menu system
@@ -271,6 +273,11 @@ Configured via `src/main/resources/logback.xml`:
 - Logs to console
 - Default level: INFO
 - Adjustable per package
+
+## Documentation
+
+- Assignment report: `Docs/DSA_Assignment2.pdf`
+  - Contains the DSA assignment write-up, implementation notes, and benchmark discussion for this project.
 
 ## Development Notes
 

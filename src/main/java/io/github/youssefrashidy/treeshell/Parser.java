@@ -110,8 +110,7 @@ public class Parser {
             case PRINT, INORDER, HEIGHT, SIZE, CLEAR -> argc == 0;
             case DELETE, CONTAINS -> argc == 1;
             case INSERT -> argc == 2;
-            case INSERT_ALL ->
-                    argc % 2 == 0; // insert all can take any even number of arguments since it takes pairs of key and value
+            case INSERT_ALL -> argc % 2 == 0; // insert all can take any even number of arguments since it takes pairs of key and value
         };
     }
 

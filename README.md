@@ -14,7 +14,7 @@ This project provides:
 
 ### 1. Tree Implementations
 - **AbstractBST**: Shared generic base class that defines core tree behavior
-- **BST (Binary Search Tree)**: Standard (non-self-balancing) binary search tree
+- **BST (Binary Search Tree)**: Standard (non-self-balancing) binary search tree with built-in BST-property validation
 - **RBBST (Red-Black BST)**: Self-balancing binary search tree with O(log n) guarantees
 
 ### 2. Benchmarking Suite
@@ -36,7 +36,7 @@ Test data generation with various distributions:
 - `NEARLY_SORTED_10`: 90% pre-sorted
 
 ### 4. TreeShell - Interactive Testing
-An interactive command-line interface to manually test tree operations without writing code.
+An interactive command-line REPL to manually test tree operations. The shell features a hand-written tokenizer and parser with robust error handling that reports precise position-aware error messages for malformed input.
 
 ## Project Structure
 
@@ -67,8 +67,8 @@ BSTs/
 │   │   └── summary/                 # Summary data structures
 │   ├── Trees/                       # Tree implementations
 │   │   ├── AbstractBST.java         # Abstract BST base class
-│   │   ├── BST.java                 # Standard BST
-│   │   ├── RBBST.java               # Red-Black BST
+│   │   ├── BST.java                 # Standard BST with BST-property validator
+│   │   ├── RBBST.java               # Red-Black BST with RB-property validator
 │   │   └── Node abstractions
 │   ├── quicksort/                   # QuickSort implementations
 │   │   ├── QuickSort.java           # Unboxed primitive sort
@@ -76,8 +76,8 @@ BSTs/
 │   └── treeshell/                   # Interactive TreeShell CLI
 │       ├── TreeShell.java
 │       ├── TreeShellMain.java
-│       ├── Tokenizer.java
-│       ├── Parser.java
+│       ├── Tokenizer.java           # Hand-written tokenizer with string literal support
+│       ├── Parser.java              # Recursive-descent parser with bounds-safe consume()
 │       ├── nodes/                   # AST node types
 │       └── tokens/                  # Token types
 │
@@ -142,23 +142,58 @@ mvn exec:java -Dexec.mainClass="io.github.youssefrashidy.Main"
 The menu provides three options:
 
 #### Option 1: TreeShell
-Interactive REPL for testing tree operations without code:
+Interactive REPL for testing tree operations:
+
 ```
 treeshell> BST t = new BST()
 treeshell> t.insert(10, "value10")
+treeshell> t.insertAll(1, "a", 2, "b", 3, "c")
 treeshell> t.contains(10)
 Result: true
 treeshell> t.inorder()
-Result: [10]
+Result: [1=a, 2=b, 3=c, 10=value10]
+treeshell> t.delete(2)
+treeshell> t.height()
+treeshell> t.size()
+treeshell> t.clear()
+treeshell> t.print()
+treeshell> exit
 ```
 
-Available commands:
-- `new BST()` / `new RBBST()` - Create tree
-- `tree.insert(key, value)` - Insert element
-- `tree.delete(key)` - Remove element
-- `tree.contains(key)` - Search element
-- `tree.inorder()` - In-order traversal
-- `exit` - Exit shell
+**Available commands:**
+
+| Command | Syntax | Description |
+|---|---|---|
+| Create tree | `BST name = new BST()` | Create a standard BST |
+| Create tree | `RB name = new RB()` | Create a Red-Black BST |
+| insert | `tree.insert(key, value)` | Insert a single key-value pair |
+| insertAll | `tree.insertAll(k1, v1, k2, v2, ...)` | Insert multiple key-value pairs in one call |
+| delete | `tree.delete(key)` | Remove a node by key |
+| contains | `tree.contains(key)` | Search for a key; returns true/false |
+| inorder | `tree.inorder()` | Print in-order traversal |
+| print | `tree.print()` | Print the tree structure |
+| height | `tree.height()` | Print the current tree height |
+| size | `tree.size()` | Print the number of nodes |
+| clear | `tree.clear()` | Remove all nodes |
+| exit | `exit` | Exit the shell |
+
+**`insertAll` notes:**
+- Takes an even number of arguments: alternating integer keys and string values.
+- Example: `t.insertAll(10, "ten", 20, "twenty", 30, "thirty")`
+- Malformed calls (odd argument count, non-integer key at an even index) are rejected with a descriptive error message before any insertion is attempted.
+
+**Parser error handling:**
+The parser validates input at every step and reports actionable errors, for example:
+```
+treeshell> t.insert(10)
+Error: Command 'INSERT' requires exactly 2 arguments but 1 were given
+treeshell> t.insert("hello", "world")
+Error: Expected first argument to be a number for command 'INSERT' at position 4
+treeshell> t.insertAll(1, "a", 2)
+Error: Invalid number of arguments for command 'INSERT_ALL' at position 7
+treeshell> BST t = new RB()
+Error: Tree type mismatch: declared 'BST' but constructed 'RB'
+```
 
 #### Option 2: Tree Benchmark
 Benchmarks tree operations (insert, contains, delete, sort) on 100k-element arrays:
@@ -279,8 +314,10 @@ Configured via `src/main/resources/logback.xml`:
 
 ## Development Notes
 
-- Uses Java 24 features (records, sealed interfaces)
-- Generic tree implementation supporting any comparable types
+- Uses Java 24 features (records, sealed interfaces, pattern matching in switch)
+- Generic tree implementation supporting any comparable key types
+- Hand-written tokenizer supports quoted string literals (`"value"`) and all shell operators
+- Parser uses a bounds-safe `consume()` helper — all out-of-bounds accesses produce descriptive `IllegalArgumentException` messages rather than raw `IndexOutOfBoundsException`
 - Comprehensive statistics collection during benchmarks
 - Non-intrusive benchmarking (minimal overhead)
 

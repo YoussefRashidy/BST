@@ -14,11 +14,13 @@ public record CommandNode(IdentifierToken identifier, CommandToken commandToken,
                     System.out.println("Tree not found: " + identifier.identifier());
                 } else {
 
-                    boolean insert ;
+                    boolean insert;
                     switch (args.get(1)) {
-                        case NumberToken num -> insert = tree.insert(((NumberToken) args.get(0)).value(),num.value());
-                        case StringToken stringToken -> insert = tree.insert(((NumberToken) args.get(0)).value(),stringToken.value());
-                        default -> throw new IllegalArgumentException("Unsupported argument type: " + args.get(1).getClass().getSimpleName());
+                        case NumberToken num -> insert = tree.insert(((NumberToken) args.get(0)).value(), num.value());
+                        case StringToken stringToken ->
+                                insert = tree.insert(((NumberToken) args.get(0)).value(), stringToken.value());
+                        default ->
+                                throw new IllegalArgumentException("Unsupported argument type: " + args.get(1).getClass().getSimpleName());
                     }
                     if (insert)
                         System.out.println("Inserted " + args.get(0) + " into tree " + identifier.identifier());
@@ -96,6 +98,29 @@ public record CommandNode(IdentifierToken identifier, CommandToken commandToken,
                     tree.clear();
                     System.out.println("Cleared tree " + identifier.identifier());
                 }
+            }
+            case INSERT_ALL -> {
+                AbstractBST<Integer, Object, ?> tree = TreeShell.environmentVars.get(identifier.identifier());
+                if (tree == null) {
+                    System.out.println("Tree not found: " + identifier.identifier());
+                } else {
+                    for (int i = 0; i < args.size(); i += 2) {
+                        boolean insert;
+                        switch (args.get(i+1)) {
+                            case NumberToken num ->
+                                    insert = tree.insert(((NumberToken) args.get(i)).value(), num.value());
+                            case StringToken stringToken ->
+                                    insert = tree.insert(((NumberToken) args.get(i)).value(), stringToken.value());
+                            default ->
+                                    throw new IllegalArgumentException("Unsupported argument type: " + args.get(1).getClass().getSimpleName());
+                        }
+                        if (insert)
+                            System.out.println("Inserted " + args.get(i) + " into tree " + identifier.identifier());
+                        else
+                            System.out.println("Value " + args.get(i) + " already exists in tree " + identifier.identifier());
+                    }
+                }
+
             }
         }
     }

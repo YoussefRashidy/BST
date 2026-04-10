@@ -34,6 +34,10 @@ public class Tokenizer {
                 }
             } else token.append(c);
         }
+        // Flush trailing token when input does not end with a delimiter.
+        if (!token.isEmpty()) {
+            tokens.add(createToken(token.toString()));
+        }
         return tokens;
     }
 
@@ -57,6 +61,10 @@ public class Tokenizer {
             case "contains" -> new CommandToken(CommandType.CONTAINS);
             case "print" -> new CommandToken(CommandType.PRINT);
             case "inorder" -> new CommandToken(CommandType.INORDER);
+            case "height" -> new CommandToken(CommandType.HEIGHT);
+            case "size" -> new CommandToken(CommandType.SIZE);
+            case "clear" -> new CommandToken(CommandType.CLEAR);
+            case "insertAll" -> new CommandToken(CommandType.INSERT_ALL);
             case "new" -> new NewToken() ;
             default -> {
                 try {

@@ -103,9 +103,6 @@ BSTs/
 ### Build
 
 ```bash
-# Clone and navigate to project
-cd d:\Study\Intellij\DEMO\BSTs
-
 # Compile with Maven
 mvn clean compile
 
